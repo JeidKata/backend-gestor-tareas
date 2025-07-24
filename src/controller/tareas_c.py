@@ -51,7 +51,7 @@ class ClientesController(FlaskController):
                 'total': len(tareas_ejemplo)
             }), 200
         
-    @app.route("/tareas/<int:id>", methods=['GET'])
+    @app.route("/tareas/<int:id>g", methods=['GET'])
     def manejar_tarea(id):
         # Aquí deberías buscar la tarea por ID en la base de datos
         # Por ahora devolvemos una tarea de ejemplo
@@ -70,7 +70,7 @@ class ClientesController(FlaskController):
         else:
             return jsonify({'error': 'Tarea no encontrada'}), 404
         
-    @app.route("/tareas/<int:id>", methods=['PUT'])
+    @app.route("/tareas/<int:id>p", methods=['PUT'])
     def actualizar_tarea(id):
         data = request.get_json()
         if not data or 'titulo' not in data or 'descripcion' not in data:
@@ -89,7 +89,7 @@ class ClientesController(FlaskController):
             'tarea': tarea_actualizada
         }), 200
     
-    @app.route("/tareas/<int:id>", methods=['DELETE'])
+    @app.route("/tareas/<int:id>d", methods=['DELETE'])
     def eliminar_tarea(id):
         # Aquí deberías eliminar la tarea de la base de datos
         return jsonify({'mensaje': 'Tarea eliminada exitosamente'}), 200
