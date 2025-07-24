@@ -1,6 +1,7 @@
 from flask import Flask
-from src.model import Base, engine
+from models import Base, engine
 from flask_controller import FlaskControllerRegister
+from flask_cors import CORS
 
 app = Flask(__name__)
 
