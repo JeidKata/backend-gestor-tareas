@@ -35,13 +35,13 @@ class ClientesController(FlaskController):
                     'id': 1,
                     'titulo': 'Tarea de ejemplo 1',
                     'descripcion': 'Esta es una tarea de ejemplo',
-                    'fecha_creacion': datetime.utcnow().isoformat()
+                    'fecha_creacion': datetime.now().isoformat()
                 },
                 {
                     'id': 2,
                     'titulo': 'Tarea de ejemplo 2',
                     'descripcion': 'Otra tarea de ejemplo',
-                    'fecha_creacion': datetime.utcnow().isoformat()
+                    'fecha_creacion': datetime.now().isoformat()
                 }
             ]
             
@@ -50,3 +50,46 @@ class ClientesController(FlaskController):
                 'tareas': tareas_ejemplo,
                 'total': len(tareas_ejemplo)
             }), 200
+        
+    @app.route("/tareas/<int:id>", methods=['GET'])
+    def manejar_tarea(id):
+        # Aquí deberías buscar la tarea por ID en la base de datos
+        # Por ahora devolvemos una tarea de ejemplo
+        tarea_ejemplo = {
+            'id': id,
+            'titulo': f'Tarea de ejemplo {id}',
+            'descripcion': 'Esta es una tarea de ejemplo',
+            'fecha_creacion': datetime.now().isoformat()
+        }
+        
+        if tarea_ejemplo:
+            return jsonify({
+                'mensaje': 'Tarea obtenida exitosamente',
+                'tarea': tarea_ejemplo
+            }), 200
+        else:
+            return jsonify({'error': 'Tarea no encontrada'}), 404
+        
+    @app.route("/tareas/<int:id>", methods=['PUT'])
+    def actualizar_tarea(id):
+        data = request.get_json()
+        if not data or 'titulo' not in data or 'descripcion' not in data:
+            return jsonify({'error': 'Datos incompletos'}), 400
+
+        # Aquí deberías actualizar la tarea en la base de datos
+        tarea_actualizada = {
+            'id': id,
+            'titulo': data['titulo'],
+            'descripcion': data['descripcion'],
+            'fecha_creacion': datetime.now().isoformat()
+        }
+
+        return jsonify({
+            'mensaje': 'Tarea actualizada exitosamente',
+            'tarea': tarea_actualizada
+        }), 200
+    
+    @app.route("/tareas/<int:id>", methods=['DELETE'])
+    def eliminar_tarea(id):
+        # Aquí deberías eliminar la tarea de la base de datos
+        return jsonify({'mensaje': 'Tarea eliminada exitosamente'}), 200
