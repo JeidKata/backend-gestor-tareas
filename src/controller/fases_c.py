@@ -33,14 +33,39 @@ class FasesController(FlaskController):
         else:
             return jsonify({"error": "Fase no encontrada"}), 404
         
-    @app.route("/fases/activo", methods=["GET"])
-    def get_fase_activo():
-        return jsonify({"fase": "activo"})
+    @app.route("/fases/<int:id>p", methods=['PUT'])
+    def actualizar_fase(id):
+        data = request.get_json()
+        if not data or 'nombre' not in data:
+            return jsonify({"error": "Se requiere el 'nombre' para actualizar la fase."}), 400
 
-    @app.route("/fases/completado", methods=["GET"])
-    def get_fase_completado():
-        return jsonify({"fase": "completado"})
+        nombre = data['nombre']
+        fase = Fase.obtener_fase_por_id(id)
+        if not fase:
+            return jsonify({"error": "Fase no encontrada"}), 404
 
-    @app.route("/fases/en_espera", methods=["GET"])
-    def get_fase_en_espera():
-        return jsonify({"fase": "en espera"})
+        try:
+            fase_actualizada = Fase.actualizar_fase(id, nombre)
+            if fase_actualizada:
+                return jsonify(fase_actualizada), 200
+            else:
+                return jsonify({"error": "No se pudo actualizar la fase"}), 500
+        except Exception as e:
+            session.rollback()
+            return jsonify({"error": f"Error al actualizar la fase: {str(e)}"}), 500
+        
+    @app.route("/fases/<int:id>d", methods=['DELETE'])
+    def eliminar_fase(id):
+        fase = Fase.obtener_fase_por_id(id)
+        if not fase:
+            return jsonify({"error": "Fase no encontrada"}), 404
+
+        try:
+            if Fase.eliminar_fase(id):
+                return jsonify({"message": "Fase eliminada exitosamente"}), 200
+            else:
+                return jsonify({"error": "No se pudo eliminar la fase"}), 500
+        except Exception as e:
+            session.rollback()
+            return jsonify({"error": f"Error al eliminar la fase: {str(e)}"}), 500
+        

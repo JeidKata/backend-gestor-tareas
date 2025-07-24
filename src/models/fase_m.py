@@ -33,5 +33,30 @@ class Fase(Base):
             return fase.to_dict()
         else:
             return None
+        
+    @classmethod
+    def obtener_fases(cls):
+        fases = session.query(cls).all()
+        return [fase.to_dict() for fase in fases]
+    
+    @classmethod
+    def actualizar_fase(cls, id, nombre):
+        fase = session.query(cls).filter(cls.id == id).first()
+        if fase:
+            fase.nombre = nombre
+            session.commit()
+            return fase.to_dict()
+        else:
+            return None
+        
+    @classmethod
+    def eliminar_fase(cls, id):
+        fase = session.query(cls).filter(cls.id == id).first()
+        if fase:
+            session.delete(fase)
+            session.commit()
+            return True
+        else:
+            return False
 
     
