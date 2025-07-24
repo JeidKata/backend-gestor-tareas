@@ -1,13 +1,9 @@
 from flask import Flask
-from models import Base, engine
+from src.models import Base, engine
 from flask_controller import FlaskControllerRegister
 from flask_cors import CORS
 
 app = Flask(__name__)
-
-@app.route('/')
-def home():
-    return "¡Aplicación Flask corriendo correctamente!"
 
 #se agrega el cors a la app y se configura para que solo acepte peticiones con el header Content-Type
 cors = CORS(app)
