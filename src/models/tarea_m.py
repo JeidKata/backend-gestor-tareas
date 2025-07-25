@@ -23,12 +23,6 @@ class Tarea(Base):
     asignado_a = relationship("Persona", back_populates="tareas_asignadas")
     tablero_asociado = relationship("Tablero", back_populates="tareas")
 
-    # def __init__(self, nombre, descripcion, fecha_inicio, fecha_fin=fecha_fin):
-    #     self.nombre = nombre
-    #     self.descripcion = descripcion
-    #     self.fecha_inicio = fecha_inicio
-    #     self.fecha_fin = fecha_fin
-
     def to_dict(self):
         return {
             "id": self.id,
