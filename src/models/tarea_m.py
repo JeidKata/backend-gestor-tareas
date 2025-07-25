@@ -65,7 +65,7 @@ class Tarea(Base):
     
     @classmethod
     def actualizar_tarea(cls, id, nombre=None, descripcion=None, fecha_inicio=None,
-                         fecha_fin=None):
+                         fecha_fin=None, fase_id=None, persona_id=None, tablero_id=None):
         tarea = session.query(cls).filter(cls.id == id).first()
         if tarea:
             if nombre:
@@ -76,6 +76,12 @@ class Tarea(Base):
                 tarea.fecha_inicio = fecha_inicio
             if fecha_fin:
                 tarea.fecha_fin = fecha_fin
+            if fase_id:
+                tarea.fase_id = fase_id
+            if persona_id:
+                tarea.persona_id = persona_id
+            if tablero_id:
+                tarea.tablero_id = tablero_id
             session.commit()
             return tarea.to_dict()
         else:

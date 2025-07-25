@@ -75,22 +75,45 @@ class ClientesController(FlaskController):
     @app.route("/tareas/<int:id>p", methods=['PUT'])
     def actualizar_tarea(id):
         data = request.get_json()
-        if not data or 'titulo' not in data or 'descripcion' not in data:
+        if not data or 'nombre' not in data or 'descripcion' not in data:
             return jsonify({'error': 'Datos incompletos'}), 400
 
-        # Aquí deberías actualizar la tarea en la base de datos
-        tarea_actualizada = {
-            'id': id,
-            'titulo': data['titulo'],
-            'descripcion': data['descripcion'],
-            'fecha_creacion': datetime.now().isoformat()
-        }
+        nombre= data['nombre']
+        descripcion= data['descripcion']
+        fecha_inicio_str = data.get('fecha_inicio')
+        fecha_fin_str = data.get('fecha_fin')
+        fase_id= data['fase_id']
+        persona_id= data['persona_id']
+        tablero_id= data['tablero_id']
 
-        return jsonify({
-            'mensaje': 'Tarea actualizada exitosamente',
-            'tarea': tarea_actualizada
-        }), 200
-    
+        fecha_inicio = None # Inicializa como None
+        fecha_fin = None # Inicializa como None
+        if fecha_inicio_str and fecha_fin_str:
+            try:
+                # Aquí es donde se convierte el string a un objeto datetime
+                fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d')
+                fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d')
+            except ValueError:
+                return jsonify({"error": "Formato de fecha_entrega inválido. Use YYYY-MM-DD."}), 400
+
+        try:
+            tarea_actualizada = Tarea.actualizar_tarea(id, nombre=nombre, descripcion=descripcion,
+                                                        fecha_inicio=fecha_inicio, fecha_fin=fecha_fin,
+                                                        fase_id=fase_id, persona_id=persona_id, tablero_id=tablero_id)
+            if tarea_actualizada:
+                return jsonify({
+                    'mensaje': 'Tarea actualizada exitosamente',
+                    'tarea': tarea_actualizada
+                }), 200  
+            else: 
+                return jsonify({
+                    'mensaje': 'Tarea no encontrada',
+                }), 404
+        except Exception as e:
+            session.rollback()
+            return jsonify({"error": f"Error interno al actualizar la tarea: {str(e)}"}), 500
+            
+
     @app.route("/tareas/<int:id>d", methods=['DELETE'])
     def eliminar_tarea(id):
         if Tarea.eliminar_tarea(id):
