@@ -2,8 +2,30 @@ from flask import Flask
 from src.models import Base, engine, session
 from flask_controller import FlaskControllerRegister
 from flask_cors import CORS
+from flask_restx import Api
 
 app = Flask(__name__)
+
+# Configuración de Swagger UI
+api = Api(
+    app, 
+    doc='/docs/',  # URL para acceder a la documentación
+    title='Gestor de Tareas API',
+    version='1.0',
+    description='API REST para gestión de tareas, proyectos y fases',
+    contact='tu-email@ejemplo.com',
+    authorizations={
+        'apikey': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'X-API-KEY'
+        }
+    }
+)
+
+# Importar y registrar namespaces
+from src.controller.tareas_restx import api as tareas_ns
+api.add_namespace(tareas_ns, path='/api/v1/tareas')
 
 #se agrega el cors a la app y se configura para que solo acepte peticiones con el header Content-Type
 cors = CORS(app)
@@ -13,6 +35,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.secret_key = 'llave_para_sesion'
 app.debug = True
 
+# Mantener el registro de controladores Flask tradicionales si los necesitas
 register = FlaskControllerRegister(app)
 register.register_package("src.controller")
 
