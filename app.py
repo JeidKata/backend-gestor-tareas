@@ -24,8 +24,17 @@ api = Api(
 )
 
 # Importar y registrar namespaces
-from src.controller.tareas_restx import api as tareas_ns
+# from src.controller.tareas_restx import api as tareas_ns
+from src.controller.tareas_restx import tareas_ns
+from src.controller.tablero_restx import tablero_ns
+from src.controller.fase_restx import fase_ns  
+from src.controller.persona_restx import persona_ns
+
+# Registrar namespaces con rutas específicas
 api.add_namespace(tareas_ns, path='/api/v1/tareas')
+api.add_namespace(tablero_ns, path='/api/v1/tableros')
+api.add_namespace(fase_ns, path='/api/v1/fases')
+api.add_namespace(persona_ns, path='/api/v1/personas')
 
 #se agrega el cors a la app y se configura para que solo acepte peticiones con el header Content-Type
 cors = CORS(app)

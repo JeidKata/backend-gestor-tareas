@@ -5,10 +5,10 @@ from src.models import session
 from src.models.tarea_m import Tarea
 
 # Crear namespace para organizar los endpoints de tareas
-api = Namespace('tareas', description='Operaciones CRUD para gestión de tareas')
+tareas_ns = Namespace('tareas', description='Operaciones CRUD para gestión de tareas')
 
 # Modelos para documentación Swagger
-tarea_model = api.model('Tarea', {
+tarea_model = tareas_ns.model('Tarea', {
     'id': fields.Integer(readonly=True, description='ID único de la tarea'),
     'nombre': fields.String(required=True, description='Nombre de la tarea', example='Completar proyecto'),
     'descripcion': fields.String(description='Descripción detallada de la tarea', example='Finalizar el desarrollo del backend'),
@@ -25,7 +25,7 @@ tarea_model = api.model('Tarea', {
 })
 
 # Modelo para crear/actualizar tarea (sin campos readonly)
-tarea_input = api.model('TareaInput', {
+tarea_input = tareas_ns.model('TareaInput', {
     'nombre': fields.String(required=True, description='Nombre de la tarea', example='Completar proyecto'),
     'descripcion': fields.String(description='Descripción detallada de la tarea', example='Finalizar el desarrollo del backend'),
     'fecha_inicio': fields.DateTime(required=True, description='Fecha de inicio planificada', example='2025-01-25T10:00:00'),
@@ -40,23 +40,23 @@ tarea_input = api.model('TareaInput', {
 })
 
 # Modelo para respuestas de error
-error_model = api.model('Error', {
+error_model = tareas_ns.model('Error', {
     'error': fields.String(description='Mensaje de error', example='Datos incompletos'),
     'codigo': fields.Integer(description='Código de error', example=400)
 })
 
 # Modelo para respuestas exitosas
-success_model = api.model('Success', {
+success_model = tareas_ns.model('Success', {
     'mensaje': fields.String(description='Mensaje de éxito', example='Tarea creada exitosamente'),
     'tarea': fields.Nested(tarea_model, description='Datos de la tarea')
 })
 
-@api.route('/')
+@tareas_ns.route('/')
 class TareaList(Resource):
-    @api.doc('listar_tareas')
-    @api.marshal_list_with(tarea_model)
-    @api.response(200, 'Lista de tareas obtenida exitosamente')
-    @api.response(500, 'Error interno del servidor')
+    @tareas_ns.doc('listar_tareas')
+    @tareas_ns.marshal_list_with(tarea_model)
+    @tareas_ns.response(200, 'Lista de tareas obtenida exitosamente')
+    @tareas_ns.response(500, 'Error interno del servidor')
     def get(self):
         """
         Obtener todas las tareas
@@ -68,14 +68,14 @@ class TareaList(Resource):
             tareas = session.query(Tarea).all()
             return [tarea.to_dict() for tarea in tareas], 200
         except Exception as e:
-            api.abort(500, f'Error al obtener tareas: {str(e)}')
+            tareas_ns.abort(500, f'Error al obtener tareas: {str(e)}')
 
-    @api.doc('crear_tarea')
-    @api.expect(tarea_input, validate=True)
-    @api.marshal_with(success_model, code=201)
-    @api.response(201, 'Tarea creada exitosamente')
-    @api.response(400, 'Datos de entrada inválidos', error_model)
-    @api.response(500, 'Error interno del servidor', error_model)
+    @tareas_ns.doc('crear_tarea')
+    @tareas_ns.expect(tarea_input, validate=True)
+    @tareas_ns.marshal_with(success_model, code=201)
+    @tareas_ns.response(201, 'Tarea creada exitosamente')
+    @tareas_ns.response(400, 'Datos de entrada inválidos', error_model)
+    @tareas_ns.response(500, 'Error interno del servidor', error_model)
     def post(self):
         """
         Crear una nueva tarea
@@ -84,14 +84,14 @@ class TareaList(Resource):
         Los campos requeridos son: nombre, fecha_inicio, fase_id y tablero_id.
         """
         try:
-            data = api.payload
+            data = tareas_ns.payload
             
             # Validaciones adicionales
             if not data.get('nombre'):
-                api.abort(400, 'El campo nombre es requerido')
+                tareas_ns.abort(400, 'El campo nombre es requerido')
             
             if not data.get('fecha_inicio'):
-                api.abort(400, 'El campo fecha_inicio es requerido')
+                tareas_ns.abort(400, 'El campo fecha_inicio es requerido')
             
             # Convertir fecha_inicio de string a datetime si es necesario
             fecha_inicio = data.get('fecha_inicio')
@@ -99,7 +99,7 @@ class TareaList(Resource):
                 try:
                     fecha_inicio = datetime.fromisoformat(fecha_inicio.replace('Z', '+00:00'))
                 except ValueError:
-                    api.abort(400, 'Formato de fecha_inicio inválido. Use formato ISO 8601')
+                    tareas_ns.abort(400, 'Formato de fecha_inicio inválido. Use formato ISO 8601')
             
             # Convertir fecha_fin si se proporciona
             fecha_fin = data.get('fecha_fin')
@@ -107,7 +107,7 @@ class TareaList(Resource):
                 try:
                     fecha_fin = datetime.fromisoformat(fecha_fin.replace('Z', '+00:00'))
                 except ValueError:
-                    api.abort(400, 'Formato de fecha_fin inválido. Use formato ISO 8601')
+                    tareas_ns.abort(400, 'Formato de fecha_fin inválido. Use formato ISO 8601')
             
             # Crear nueva tarea
             nueva_tarea = Tarea(
@@ -135,16 +135,16 @@ class TareaList(Resource):
             
         except Exception as e:
             session.rollback()
-            api.abort(500, f'Error al crear la tarea: {str(e)}')
+            tareas_ns.abort(500, f'Error al crear la tarea: {str(e)}')
 
-@api.route('/<int:tarea_id>')
-@api.param('tarea_id', 'ID único de la tarea')
+@tareas_ns.route('/<int:tarea_id>')
+@tareas_ns.param('tarea_id', 'ID único de la tarea')
 class TareaResource(Resource):
-    @api.doc('obtener_tarea')
-    @api.marshal_with(tarea_model)
-    @api.response(200, 'Tarea obtenida exitosamente')
-    @api.response(404, 'Tarea no encontrada', error_model)
-    @api.response(500, 'Error interno del servidor', error_model)
+    @tareas_ns.doc('obtener_tarea')
+    @tareas_ns.marshal_with(tarea_model)
+    @tareas_ns.response(200, 'Tarea obtenida exitosamente')
+    @tareas_ns.response(404, 'Tarea no encontrada', error_model)
+    @tareas_ns.response(500, 'Error interno del servidor', error_model)
     def get(self, tarea_id):
         """
         Obtener una tarea específica por ID
@@ -155,20 +155,20 @@ class TareaResource(Resource):
         try:
             tarea = session.query(Tarea).filter_by(id=tarea_id).first()
             if not tarea:
-                api.abort(404, f'Tarea con ID {tarea_id} no encontrada')
+                tareas_ns.abort(404, f'Tarea con ID {tarea_id} no encontrada')
             
             return tarea.to_dict(), 200
             
         except Exception as e:
-            api.abort(500, f'Error al obtener la tarea: {str(e)}')
+            tareas_ns.abort(500, f'Error al obtener la tarea: {str(e)}')
 
-    @api.doc('actualizar_tarea')
-    @api.expect(tarea_input, validate=True)
-    @api.marshal_with(success_model)
-    @api.response(200, 'Tarea actualizada exitosamente')
-    @api.response(404, 'Tarea no encontrada', error_model)
-    @api.response(400, 'Datos de entrada inválidos', error_model)
-    @api.response(500, 'Error interno del servidor', error_model)
+    @tareas_ns.doc('actualizar_tarea')
+    @tareas_ns.expect(tarea_input, validate=True)
+    @tareas_ns.marshal_with(success_model)
+    @tareas_ns.response(200, 'Tarea actualizada exitosamente')
+    @tareas_ns.response(404, 'Tarea no encontrada', error_model)
+    @tareas_ns.response(400, 'Datos de entrada inválidos', error_model)
+    @tareas_ns.response(500, 'Error interno del servidor', error_model)
     def put(self, tarea_id):
         """
         Actualizar una tarea existente
@@ -179,9 +179,9 @@ class TareaResource(Resource):
         try:
             tarea = session.query(Tarea).filter_by(id=tarea_id).first()
             if not tarea:
-                api.abort(404, f'Tarea con ID {tarea_id} no encontrada')
+                tareas_ns.abort(404, f'Tarea con ID {tarea_id} no encontrada')
             
-            data = api.payload
+            data = tareas_ns.payload
             
             # Actualizar campos
             if 'nombre' in data:
@@ -220,12 +220,12 @@ class TareaResource(Resource):
             
         except Exception as e:
             session.rollback()
-            api.abort(500, f'Error al actualizar la tarea: {str(e)}')
+            tareas_ns.abort(500, f'Error al actualizar la tarea: {str(e)}')
 
-    @api.doc('eliminar_tarea')
-    @api.response(200, 'Tarea eliminada exitosamente')
-    @api.response(404, 'Tarea no encontrada', error_model)
-    @api.response(500, 'Error interno del servidor', error_model)
+    @tareas_ns.doc('eliminar_tarea')
+    @tareas_ns.response(200, 'Tarea eliminada exitosamente')
+    @tareas_ns.response(404, 'Tarea no encontrada', error_model)
+    @tareas_ns.response(500, 'Error interno del servidor', error_model)
     def delete(self, tarea_id):
         """
         Eliminar una tarea
@@ -236,7 +236,7 @@ class TareaResource(Resource):
         try:
             tarea = session.query(Tarea).filter_by(id=tarea_id).first()
             if not tarea:
-                api.abort(404, f'Tarea con ID {tarea_id} no encontrada')
+                tareas_ns.abort(404, f'Tarea con ID {tarea_id} no encontrada')
             
             session.delete(tarea)
             session.commit()
@@ -245,15 +245,15 @@ class TareaResource(Resource):
             
         except Exception as e:
             session.rollback()
-            api.abort(500, f'Error al eliminar la tarea: {str(e)}')
+            tareas_ns.abort(500, f'Error al eliminar la tarea: {str(e)}')
 
-@api.route('/estado/<string:estado>')
-@api.param('estado', 'Estado de las tareas a filtrar (pendiente, en_progreso, completada)')
+@tareas_ns.route('/estado/<string:estado>')
+@tareas_ns.param('estado', 'Estado de las tareas a filtrar (pendiente, en_progreso, completada)')
 class TareasPorEstado(Resource):
-    @api.doc('listar_tareas_por_estado')
-    @api.marshal_list_with(tarea_model)
-    @api.response(200, 'Tareas filtradas por estado')
-    @api.response(500, 'Error interno del servidor')
+    @tareas_ns.doc('listar_tareas_por_estado')
+    @tareas_ns.marshal_list_with(tarea_model)
+    @tareas_ns.response(200, 'Tareas filtradas por estado')
+    @tareas_ns.response(500, 'Error interno del servidor')
     def get(self, estado):
         """
         Obtener tareas filtradas por estado
@@ -265,4 +265,4 @@ class TareasPorEstado(Resource):
             tareas = session.query(Tarea).filter_by(estado=estado).all()
             return [tarea.to_dict() for tarea in tareas], 200
         except Exception as e:
-            api.abort(500, f'Error al filtrar tareas: {str(e)}')
+            tareas_ns.abort(500, f'Error al filtrar tareas: {str(e)}')
