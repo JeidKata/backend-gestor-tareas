@@ -13,6 +13,9 @@ class Tablero(Base):
     fecha_entrega = Column(DateTime, nullable=True)
     estado = Column(String, default="activo", nullable=False) # e.g., 'activo', 'completado', 'en espera'
 
+    # Relationships
+    tareas = relationship("Tarea", back_populates="tablero_asociado", cascade="all, delete-orphan")
+
     def to_dict(self):
         return {
             "id": self.id,

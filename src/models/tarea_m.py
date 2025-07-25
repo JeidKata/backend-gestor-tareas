@@ -19,15 +19,15 @@ class Tarea(Base):
     tablero_id = Column(Integer, ForeignKey("tablero.id"), nullable=False)
 
     # Relationships
-    fase_asociada = relationship("Fase", back_populates="tareas")
+    fase_asociada = relationship("Fase", back_populates="tareas_asociadas")
     asignado_a = relationship("Persona", back_populates="tareas_asignadas")
     tablero_asociado = relationship("Tablero", back_populates="tareas")
 
-    def __init__(self, nombre, descripcion, fecha_inicio, estado="pendiente"):
+    def __init__(self, nombre, descripcion, fecha_inicio, fecha_fin=fecha_fin):
         self.nombre = nombre
         self.descripcion = descripcion
         self.fecha_inicio = fecha_inicio
-        self.estado = estado
+        self.fecha_fin = fecha_fin
 
     def to_dict(self):
         return {
@@ -37,7 +37,6 @@ class Tarea(Base):
             "fecha_creacion": self.fecha_creacion.isoformat(),
             "fecha_inicio": self.fecha_inicio.isoformat(),
             "fecha_fin": self.fecha_fin.isoformat() if self.fecha_fin else None,
-            "estado": self.estado,
             "fase_id": self.fase_id,
             "persona_id": self.persona_id,
             "tablero_id": self.tablero_id
@@ -72,7 +71,7 @@ class Tarea(Base):
     
     @classmethod
     def actualizar_tarea(cls, id, nombre=None, descripcion=None, fecha_inicio=None,
-                         fecha_fin=None, estado=None):
+                         fecha_fin=None):
         tarea = session.query(cls).filter(cls.id == id).first()
         if tarea:
             if nombre:
@@ -83,8 +82,6 @@ class Tarea(Base):
                 tarea.fecha_inicio = fecha_inicio
             if fecha_fin:
                 tarea.fecha_fin = fecha_fin
-            if estado:
-                tarea.estado = estado
             session.commit()
             return tarea.to_dict()
         else:

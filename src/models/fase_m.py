@@ -1,11 +1,15 @@
 from . import Base, session
 from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy.orm import relationship
 
 class Fase(Base):
     __tablename__ = "fase"
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, nullable=False, unique=True)
+
+    # Relationships
+    tareas_asociadas = relationship("Tarea", back_populates="fase_asociada", cascade="all, delete-orphan")
 
     def __init__(self, nombre):
         self.nombre = nombre

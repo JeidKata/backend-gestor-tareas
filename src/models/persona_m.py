@@ -10,6 +10,9 @@ class Persona(Base):
     correo = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False) # In a real app, store hashed passwords!
 
+    # Relationships
+    tareas_asignadas = relationship("Tarea", back_populates="asignado_a", cascade="all, delete-orphan")
+
     def __init__(self, nombre, correo, password):
         self.nombre = nombre
         self.correo = correo
