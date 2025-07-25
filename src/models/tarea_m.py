@@ -23,11 +23,11 @@ class Tarea(Base):
     asignado_a = relationship("Persona", back_populates="tareas_asignadas")
     tablero_asociado = relationship("Tablero", back_populates="tareas")
 
-    def __init__(self, nombre, descripcion, fecha_inicio, fecha_fin=fecha_fin):
-        self.nombre = nombre
-        self.descripcion = descripcion
-        self.fecha_inicio = fecha_inicio
-        self.fecha_fin = fecha_fin
+    # def __init__(self, nombre, descripcion, fecha_inicio, fecha_fin=fecha_fin):
+    #     self.nombre = nombre
+    #     self.descripcion = descripcion
+    #     self.fecha_inicio = fecha_inicio
+    #     self.fecha_fin = fecha_fin
 
     def to_dict(self):
         return {
@@ -48,9 +48,9 @@ class Tarea(Base):
                 f"persona_id={self.persona_id})>")
     
     @classmethod
-    def crear_tarea(cls, nombre, descripcion, fecha_inicio, fase_id, persona_id, tablero_id):
+    def crear_tarea(cls, nombre, descripcion, fecha_inicio, fecha_fin, fase_id, persona_id, tablero_id):
         nueva_tarea = cls(nombre=nombre, descripcion=descripcion,
-                          fecha_inicio=fecha_inicio, fase_id=fase_id,
+                          fecha_inicio=fecha_inicio, fecha_fin= fecha_fin, fase_id=fase_id,
                           persona_id=persona_id, tablero_id=tablero_id)
         session.add(nueva_tarea)
         session.commit()
