@@ -5,7 +5,7 @@ class Fase(Base):
     __tablename__ = "fase"
 
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False, unique=True) # e.g., "Planning", "Development", "Testing"
+    nombre = Column(String, nullable=False, unique=True)
 
     def __init__(self, nombre):
         self.nombre = nombre

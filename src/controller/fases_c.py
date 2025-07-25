@@ -21,10 +21,9 @@ class FasesController(FlaskController):
 
     @app.route("/fases", methods=['GET']) # Nueva ruta para listar fases
     def listar_fases_api():
-        fases = session.query(Fase).all() # Obtener todas las fases de la DB
-        fases_data = [fase.to_dict() for fase in fases]
-        return jsonify({"fases": fases_data})
-
+        fases = Fase.obtener_fases()
+        return jsonify(fases), 200
+    
     @app.route("/fases/<int:id>", methods=['GET'])
     def obtener_fase(id):
         fase = Fase.obtener_fase_por_id(id)
