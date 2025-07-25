@@ -1,4 +1,4 @@
-from . import Base
+from . import Base, session
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -12,7 +12,6 @@ class Tarea(Base):
     fecha_creacion = Column(DateTime, default=datetime.now, nullable=False)
     fecha_inicio = Column(DateTime, nullable=False)
     fecha_fin = Column(DateTime, nullable=True) # Can be null if not yet finished
-    estado = Column(String, default="pendiente", nullable=False) # e.g., 'pendiente', 'en progreso', 'completada'
 
     # Foreign Keys
     fase_id = Column(Integer, ForeignKey("fase.id"), nullable=False)
@@ -40,6 +39,7 @@ class Tarea(Base):
             "fecha_fin": self.fecha_fin.isoformat() if self.fecha_fin else None,
             "estado": self.estado,
             "fase_id": self.fase_id,
+            "persona_id": self.persona_id,
             "tablero_id": self.tablero_id
         }
     
@@ -47,3 +47,55 @@ class Tarea(Base):
         return (f"<Tarea(id={self.id}, nombre='{self.nombre}', "
                 f"tablero_id={self.tablero_id}, fase_id={self.fase_id}, "
                 f"persona_id={self.persona_id})>")
+    
+    @classmethod
+    def crear_tarea(cls, nombre, descripcion, fecha_inicio, fase_id, persona_id, tablero_id):
+        nueva_tarea = cls(nombre=nombre, descripcion=descripcion,
+                          fecha_inicio=fecha_inicio, fase_id=fase_id,
+                          persona_id=persona_id, tablero_id=tablero_id)
+        session.add(nueva_tarea)
+        session.commit()
+        return nueva_tarea.to_dict()
+    
+    @classmethod
+    def obtener_tarea_por_id(cls, id):
+        tarea = session.query(cls).filter(cls.id == id).first()
+        if tarea:
+            return tarea.to_dict()
+        else:
+            return None
+        
+    @classmethod
+    def listar_tareas(cls):
+        tareas = session.query(cls).all()
+        return [tarea.to_dict() for tarea in tareas]
+    
+    @classmethod
+    def actualizar_tarea(cls, id, nombre=None, descripcion=None, fecha_inicio=None,
+                         fecha_fin=None, estado=None):
+        tarea = session.query(cls).filter(cls.id == id).first()
+        if tarea:
+            if nombre:
+                tarea.nombre = nombre
+            if descripcion:
+                tarea.descripcion = descripcion
+            if fecha_inicio:
+                tarea.fecha_inicio = fecha_inicio
+            if fecha_fin:
+                tarea.fecha_fin = fecha_fin
+            if estado:
+                tarea.estado = estado
+            session.commit()
+            return tarea.to_dict()
+        else:
+            return None
+        
+    @classmethod
+    def eliminar_tarea(cls, id):
+        tarea = session.query(cls).filter(cls.id == id).first()
+        if tarea:
+            session.delete(tarea)
+            session.commit()
+            return True
+        else:
+            return False
