@@ -61,21 +61,13 @@ class ClientesController(FlaskController):
                 'tareas': tareas, 'total': len(tareas)
             }), 200
 
-    @app.route("/tareas/<int:id>", methods=['GET'])
-    def manejar_tarea(id):
-        # Aquí deberías buscar la tarea por ID en la base de datos
-        # Por ahora devolvemos una tarea de ejemplo
-        tarea_ejemplo = {
-            'id': id,
-            'titulo': f'Tarea de ejemplo {id}',
-            'descripcion': 'Esta es una tarea de ejemplo',
-            'fecha_creacion': datetime.now().isoformat()
-        }
-        
-        if tarea_ejemplo:
+    @app.route("/tareas/<int:id>g", methods=['GET'])
+    def obtener_tarea(id):
+        tarea = Tarea.obtener_tarea_por_id(id)
+        if tarea:
             return jsonify({
                 'mensaje': 'Tarea obtenida exitosamente',
-                'tarea': tarea_ejemplo
+                'tarea': tarea
             }), 200
         else:
             return jsonify({'error': 'Tarea no encontrada'}), 404
