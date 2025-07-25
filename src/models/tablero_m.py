@@ -13,13 +13,6 @@ class Tablero(Base):
     fecha_entrega = Column(DateTime, nullable=True)
     estado = Column(String, default="activo", nullable=False) # e.g., 'activo', 'completado', 'en espera'
 
-
-    # def __init__(self, nombre, descripcion=None, fecha_entrega=None, estado="activo"):
-    #     self.nombre = nombre
-    #     self.descripcion = descripcion
-    #     self.fecha_entrega = fecha_entrega
-    #     self.estado = estado
-
     def to_dict(self):
         return {
             "id": self.id,
