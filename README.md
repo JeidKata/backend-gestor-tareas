@@ -595,7 +595,7 @@ Este proyecto está licenciado bajo la **MIT License** - ver el archivo [LICENSE
 ```
 MIT License
 
-Copyright (c) 2025 [Tu Nombre]
+Copyright (c) 2025 Jeidy Olaya
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -632,6 +632,6 @@ copies of the Software...
 
 ⭐ **¡No olvides dar una estrella al repositorio si te fue útil!** ⭐
 
-[![Made with ❤️ by [github.com/JeidKata]](https://img.shields.io/badge/Made%20with%20❤️%20by-Tu%20Nombre-red.svg)](https://github.com/JeidKata)
+[![Made with ❤️ by Jeidy Olaya](https://img.shields.io/badge/Made%20with%20❤️%20by-Jeidy%20Olaya-red.svg)](https://github.com/JeidKata)
 
 </div>
